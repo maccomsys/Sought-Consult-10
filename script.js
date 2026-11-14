@@ -476,8 +476,10 @@ function initWebsiteScripts() {
     console.warn('Could not parse service parameter:', err);
   }
 
-  // Wire all forms across the website
-  document.querySelectorAll('.contact-form, #appointmentForm, #mainContactForm').forEach((form) => {
+  // Wire all forms across the website (excluding the dedicated building materials request form)
+  document.querySelectorAll('.contact-form:not(#materialRequestForm), #appointmentForm, #mainContactForm').forEach((form) => {
+    if (form.id === 'materialRequestForm') return;
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       submitFormToWhatsApp(form);
@@ -834,10 +836,18 @@ function initWebsiteScripts() {
     closeMaterialModal();
   }
 
-  materialRequestForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    submitMaterialToWhatsApp(materialRequestForm);
-  });
+  if (materialRequestForm) {
+    materialRequestForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitMaterialToWhatsApp(materialRequestForm);
+    });
+
+    const materialSubmitBtn = materialRequestForm.querySelector('.btn-submit-whatsapp, .btn-send-whatsapp, button[type="submit"]');
+    materialSubmitBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitMaterialToWhatsApp(materialRequestForm);
+    });
+  }
 
   // -------------------------------------------------------------------------
   // 8. Global Escape Key Handler
